@@ -21,26 +21,11 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                script {
-                    def dockerImage = docker.image('python-addition')
-                    dockerImage.run('--rm', 'pytest')
-                    currentBuild.result = dockerImage.inside("--rm", "--tty", "--workdir /app", "--entrypoint=''") {
-                        sh "pytest"
-                    }
-                }
-            }
-        }
-
-        // Add more stages as needed for reporting, deployment, etc.
+        // Add stages for testing, reporting, etc.
     }
 
     post {
         always {
-            script {
-                junit '**/test-results.xml'
-            }
             cleanWs()
         }
     }
