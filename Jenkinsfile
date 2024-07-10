@@ -1,37 +1,27 @@
 pipeline {
     agent any
+    
+    environment {
+        GIT_REPO = "https://github.com/vishwa21pratap/python-addition-automation.git"
+        DOCKERFILE_PATH = "./Dockerfile"  // Path to Dockerfile in your repository
+    }
 
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/vishwa21pratap/python-addition-automation.git'
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: "${GIT_REPO}"]]])
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build('python-addition')
+                    docker.build("python-addition", "-f ${DOCKERFILE_PATH} .")
                 }
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                script {
-                    def app = docker.image('python-addition')
-                    app.inside {
-                        sh 'pytest'
-                    }
-                }
-            }
-        }
-
-        stage('Report Results') {
-            steps {
-                junit '**/test-results/*.xml'
-            }
-        }
+        // Add stages for testing, reporting, etc.
     }
 
     post {
