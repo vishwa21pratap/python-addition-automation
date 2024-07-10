@@ -24,7 +24,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    def testResults = docker.image("python-addition").inside("-v $PWD:/app") {
+                    def testResults = docker.image("python-addition").inside("-v ${WORKSPACE}:/app") {
                         sh "pytest"
                     }
                     junit testResults
