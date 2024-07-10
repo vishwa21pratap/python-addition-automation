@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: "${GIT_REPO}"]]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: "${GIT_REPO}"]]])
             }
         }
 
@@ -21,7 +21,16 @@ pipeline {
             }
         }
 
-        // Add stages for testing, reporting, etc.
+        stage('Run Tests') {
+            steps {
+                script {
+                    def testResults = docker.image("python-addition").inside {
+                        sh "pytest"
+                    }
+                    junit testResults
+                }
+            }
+        }
     }
 
     post {
