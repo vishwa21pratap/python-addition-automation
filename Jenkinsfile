@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/yourusername/python-addition-automation.git'
+                git 'https://github.com/vishwa21pratap/python-addition-automation.git'
             }
         }
 
