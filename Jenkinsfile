@@ -21,7 +21,15 @@ pipeline {
             }
         }
 
-        // Add stages for testing, reporting, etc.
+        stage('Run Tests') {
+            steps {
+                script {
+                    docker.image('python-addition').run('--rm', 'pytest')
+                }
+            }
+        }
+
+        // Add more stages as needed for reporting, deployment, etc.
     }
 
     post {
