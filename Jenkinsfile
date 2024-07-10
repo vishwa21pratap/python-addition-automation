@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: "${GIT_REPO}"]]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: "${GIT_REPO}"]]])
             }
         }
 
@@ -24,7 +24,14 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    docker.image('python-addition').run('--rm', 'pytest')
+                    def testResults = docker.image('python-addition').run('--rm', 'pytest', returnStdout: true).trim()
+                    if (testResults.contains("ERRORS") || testResults.contains("FAILED")) {
+                        currentBuild.result = 'FAILED'
+                        error "Tests failed"
+                    } else {
+                        currentBuild.result = 'SUCCESS'
+                        echo "Tests passed successfully"
+                    }
                 }
             }
         }
@@ -35,6 +42,12 @@ pipeline {
     post {
         always {
             cleanWs()
+        }
+        success {
+            echo "Pipeline succeeded! Tests passed."
+        }
+        failure {
+            echo "Pipeline failed! Tests did not pass."
         }
     }
 }
