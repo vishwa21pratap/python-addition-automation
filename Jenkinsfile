@@ -24,7 +24,9 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    def testResults = docker.image('python-addition').run('--rm', 'pytest', returnStdout: true).trim()
+                    def dockerCommand = "docker run --rm -v ${PWD}:/app python-addition pytest"
+                    def testResults = sh(script: dockerCommand, returnStdout: true).trim()
+                    
                     if (testResults.contains("ERRORS") || testResults.contains("FAILED")) {
                         currentBuild.result = 'FAILED'
                         error "Tests failed"
@@ -35,8 +37,6 @@ pipeline {
                 }
             }
         }
-
-        // Add more stages as needed for reporting, deployment, etc.
     }
 
     post {
