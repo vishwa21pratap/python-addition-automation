@@ -24,7 +24,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    def dockerCommand = "docker run --rm -v ${PWD}:/app python-addition pytest"
+                    def dockerCommand = "docker run --rm -v ${env.WORKSPACE}:/app python-addition pytest"
                     def testResults = sh(script: dockerCommand, returnStdout: true).trim()
                     
                     if (testResults.contains("ERRORS") || testResults.contains("FAILED")) {
